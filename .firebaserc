@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "database-8983e": {
+      "hosting": {
+        "database": [
+          "database-8983e"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "database-8983e"
+  }
+}
