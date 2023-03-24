@@ -1,25 +1,28 @@
 <div class="container mt-4">
     <div class="card">
-        <div class="card-body ">
+        <div class="card-body table-responsive-sm">
             <span class="h3">Listado de Empleados</span>
-            <button class="btn btn-dark btn-lg" style="float: right" routerLink="/create-empleado">Agregar</button>
-            <table class="table mt-5 table-striped">
+            <button class="btn btn-dark btn-lg float-right" style="float: right" routerLink="/create-empleado">Agregar</button>
+            <h5 *ngIf='empleados.length === 0' class="mt-4" >No hay datos para mostrar</h5>
+            <table *ngIf="empleados.length > 0" class="table mt-5 table-striped">
                 <thead>
                   <tr>
                     <th>Nombre</th>
                     <th>Apellido</th>
-                    <th>Documento</th>
-                    <th>Salario</th>
+                    <th>Edad</th>
+                    <th>Correo</th>
+                    <th>NickName</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let empleado of empleados">
                     <th>{{ empleado.nombre }}</th>
                     <td>{{ empleado.apellido }}</td>
-                    <td>{{ empleado.documento }}</td>
-                    <td>{{ empleado.salario | currency }}</td>
+                    <td>{{ empleado.edad }}</td>
+                    <td>{{ empleado.email }}</td>
+                    <td>{{ empleado.nickname }}</td>
                     <td>
-                        <i class="fas fa-edit fa-lg text-info" style="margin-right: 8px; cursor: pointer"></i>
+                        <i class="fas fa-edit fa-lg text-info" style="margin-right: 8px; cursor: pointer" [routerLink]="['/edit-empleado/', empleado.id]"></i>
                         <i (click)="eliminarEmpleado(empleado.id)" class="fas fa-trash-alt fa-lg text-danger" style=" cursor: pointer;"></i>
                     </td>
                   </tr>

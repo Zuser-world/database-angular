@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { collection, collectionData, DocumentReference, Firestore, doc, addDoc, CollectionReference } from '@angular/fire/firestore';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { EmpleadoService } from 'src/app/services/empleado.service';
@@ -18,44 +18,59 @@ export class CreateEmpleadoComponent implements OnInit {
   createEmpleado : FormGroup;
   submitted = false;
   loading : boolean = false;
-  firestore : Firestore = inject(Firestore);
-  usersCollection: CollectionReference | any;
+  id: string | null;
+  title: string = "Crear Empleado";
+  type: string = "Agregar"
+
   constructor (
   private fb: FormBuilder,
   private empleadoservice: EmpleadoService,
   private router: Router,
   private toastr: ToastrService,
+  private aRoute: ActivatedRoute,
   // private firestore: AngularFirestore,
   ){
     this.createEmpleado = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      documento: ['', Validators.required],
-      salario: ['', Validators.required],
+      edad: ['', [Validators.required, Validators.max(80)]],
+      nickname: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [Validators.required, Validators.email]],
+
     })
-    // const productosCollection = collection(firestore, 'productos');
-    // firestore.collection('tabla').add({
-    //   nombre : "patata",
-    //   apellido: "caca",
-    //   edad: 23,
-    // })
-    // productosCollection
+    // Hacemos uso de una clase para poder tomar el id que se envia por el enlace.
+    // La Clase se llama ActivatedRoute.
+    this.id = this.aRoute.snapshot.paramMap.get('id');
+    console.log(this.id)
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.editar()
+  }
   agregarEmpleado(){
     this.submitted = true;
+    if (this.id === null){
+      this.agregar();
+    } else {
+      this.editarEmpleado(this.id);
+    }
+  }
+  agregar(){
+    console.log(this.createEmpleado)
     const nombre = this.createEmpleado.value.nombre;
     const apellido = this.createEmpleado.value.apellido;
-    const documento = this.createEmpleado.value.documento;
-    const salario = this.createEmpleado.value.salario;
+    const edad = this.createEmpleado.value.edad;
+    const nickname = this.createEmpleado.value.nickname;
+    const email = this.createEmpleado.value.email;
     if (this.createEmpleado.invalid){
       return;
     }
+
     const empleado: any = {
       nombre : nombre,
       apellido : apellido,
-      documento : documento,
-      salario : salario,
+      edad : edad,
+      nickname : nickname,
+      email: email,
       fechaCreacion : new Date(),
       fechaActualizacion : new Date(),
     }
@@ -76,6 +91,52 @@ export class CreateEmpleadoComponent implements OnInit {
       console.log(err.message)
       this.loading = false
     })
+  }
+  editarEmpleado(id: string){
+    this.loading = true;
+    const nombre = this.createEmpleado.value.nombre;
+    const apellido = this.createEmpleado.value.apellido;
+    const edad = this.createEmpleado.value.edad;
+    const nickname = this.createEmpleado.value.nickname;
+    const email = this.createEmpleado.value.email;
+
+    const empleado: any = {
+      nombre : nombre,
+      apellido : apellido,
+      edad : edad,
+      nickname : nickname,
+      email: email,
+      fechaActualizacion : new Date(),
+    }
+    this.empleadoservice.changeinfo(id, empleado).then(() => {
+      this.loading = false;
+      this.toastr.info("Empleado fue modificado con exito", "Modificado",{
+        positionClass : 'toast-bottom-right',
+      })
+      this.router.navigate(['/list-empleados'])
+    })
+  }
+
+
+  editar(){
+    // Relleno de la Información a partir de la Base de Datos  
+    if (this.id !== null){
+      this.loading = true;
+      this.title = "Editar Empleado"
+      this.type = "Cambiar"
+      this.empleadoservice.editEmpleado(this.id).subscribe(data => {
+        this.loading = false;
+        console.log(data.payload.data()['nombre'])
+        // Rellenar los campos del Formulario creado previamente.
+        this.createEmpleado.setValue({
+          nombre: data.payload.data()['nombre'],
+          apellido: data.payload.data()['apellido'],
+          edad: data.payload.data()['edad'],
+          nickname: data.payload.data()['nickname'],
+          email: data.payload.data()['email'],
+        })
+      })
+    }
   }
 }
 

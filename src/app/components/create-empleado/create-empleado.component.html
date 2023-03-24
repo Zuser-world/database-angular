@@ -3,7 +3,7 @@
         <div class="col-lg-6 offset-lg-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h3>Agregar Empleados</h3>
+                    <h3>{{ title }}</h3>
                     <div *ngIf="loading" class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -12,19 +12,50 @@
                         <div class="row">
                             <div class="col">
                                 <input type="text" class="form-control form-control-lg" formControlName="nombre" placeholder="Nombre">
+                                <span *ngIf="createEmpleado.get('nombre')?.hasError('required') && createEmpleado.get('nombre')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Nombre</strong> requerido</p>
+                                </span>
                             </div>
                             <div class="col">
                                 <input type="text" class="form-control form-control-lg" formControlName="apellido" placeholder="Apellido">
+                                <span *ngIf="createEmpleado.get('apellido')?.hasError('required') && createEmpleado.get('apellido')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Apellido</strong> requerido</p>
+                                </span>
                             </div>
                         </div>
-                        <input type="text" class="form-control form-control-lg mt-3" formControlName="documento" placeholder="Documento">
-                        <input type="number" class="form-control form-control-lg mt-3" formControlName="salario" placeholder="Salario">
+                        <div class="row">
+                            <div class="col">
+                                <input type="number" class="form-control form-control-lg mt-3" formControlName="edad" placeholder="Edad" min="1" max="80">
+                                <span *ngIf="createEmpleado.get('edad')?.hasError('required') && createEmpleado.get('edad')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Edad</strong> requerida</p>
+                                </span>
+                                <span *ngIf="createEmpleado.get('edad')?.hasError('max') && createEmpleado.get('edad')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Edad</strong> invalida</p>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control form-control-lg mt-3" formControlName="nickname" placeholder="Nick Name">
+                                <span *ngIf="createEmpleado.get('nickname')?.hasError('required') && createEmpleado.get('nickname')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Nick Name</strong> requerido</p>
+                                </span>
+                                <span *ngIf="createEmpleado.get('nickname')?.hasError('minlength') && createEmpleado.get('nickname')?.touched" class="text-danger errorLabel">
+                                    <p class="text-start mt-3 mb-1"><strong>Nick Name</strong> de 6 caracteres</p>
+                                  </span>
+                            </div>
+                        </div>
+                        <input type="email" class="form-control form-control-lg mt-3" formControlName="email" placeholder="Correo">
+                        <span *ngIf="createEmpleado.get('email')?.hasError('required') && createEmpleado.get('email')?.touched" class="text-danger errorLabel">
+                            <strong>Correo</strong> requerido
+                        </span>
+                          <span *ngIf="createEmpleado.get('email')?.hasError('email') && createEmpleado.get('email')?.touched" class="text-danger errorLabel">
+                            El <strong>formato</strong> es invalido
+                          </span>
                         <div class="mt-3">
-                            <button type="text" class="btn btn-secondary btn-lg" style="margin-right: 30px;" routerLink="/list-empleados">
+                            <button type="text" class="btn btn-dark btn-lg" style="margin-right: 30px;" routerLink="/list-empleados">
                                 Volver
                             </button>
-                            <button type="submit" class="btn btn-dark btn-lg">
-                                Agregar
+                            <button [disabled]="createEmpleado.invalid" type="submit" class="btn btn-dark btn-lg">
+                                {{ type }}
                             </button>
                         </div>
                     </form>
